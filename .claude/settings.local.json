@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(env)",
+      "Bash(else)",
+      "Bash(fi)"
+    ]
+  }
+}

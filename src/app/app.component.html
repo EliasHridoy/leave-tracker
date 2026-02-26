@@ -1,0 +1,102 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="#818cf8" stroke-width="2"/>
+          <path d="M3 9H21" stroke="#818cf8" stroke-width="2"/>
+          <path d="M8 2V6M16 2V6" stroke="#818cf8" stroke-width="2" stroke-linecap="round"/>
+          <path d="M7 13H17M7 17H13" stroke="#818cf8" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Leave Tracker</span>
+      </div>
+      <button class="btn-add-emp" type="button" (click)="openAddModal()">+ Add</button>
+    </div>
+
+    <div class="sidebar-label">EMPLOYEES ({{ employees.length }})</div>
+
+    <div class="employee-list">
+      @for (emp of employees; track emp.id) {
+        <div
+          class="employee-item"
+          [class.active]="emp.id === selectedEmployee?.id"
+          (click)="selectEmployee(emp)"
+        >
+          <div class="emp-avatar">{{ avatar(emp.name) }}</div>
+          <span class="emp-name">{{ emp.name }}</span>
+          <div class="emp-actions">
+            <button class="btn-emp-action edit" type="button" (click)="openEditModal(emp, $event)" title="Edit">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="btn-emp-action delete" type="button" (click)="deleteEmployee(emp, $event)" title="Delete">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+      @if (employees.length === 0) {
+        <div class="empty-sidebar">
+          <span>No employees yet.</span>
+          <span>Click "+ Add" to start.</span>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    @if (selectedEmployee) {
+      <app-employee-detail
+        [employeeId]="selectedEmployee.id"
+        [employeeName]="selectedEmployee.name"
+      />
+    } @else {
+      <div class="empty-state">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="9" cy="7" r="4" stroke="#cbd5e1" stroke-width="1.5"/>
+          <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M16 11l2 2 4-4" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Select an Employee</h2>
+        <p>Choose an employee from the sidebar to view their leave details, or click "+ Add" to add a new team member.</p>
+      </div>
+    }
+  </main>
+</div>
+
+<!-- Employee Modal -->
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingEmployee ? 'Edit Employee' : 'Add Employee' }}</h3>
+        <button class="btn-close" type="button" (click)="closeModal()">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <label for="emp-name-input">Full Name</label>
+        <input
+          id="emp-name-input"
+          type="text"
+          [(ngModel)]="employeeName"
+          name="employeeName"
+          placeholder="e.g. John Smith"
+          (keyup.enter)="saveEmployee()"
+        />
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" type="button" (click)="closeModal()">Cancel</button>
+        <button class="btn-primary" type="button" (click)="saveEmployee()">
+          {{ editingEmployee ? 'Update' : 'Add Employee' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
