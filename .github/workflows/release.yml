@@ -23,6 +23,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: yarn
+
+      - name: enable corepack
+        run: corepack enable
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -39,13 +43,14 @@ jobs:
             patchelf
 
       - name: install frontend dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: build and release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tauriScript: yarn tauri
           tagName: app-v__VERSION__
           releaseName: "App v__VERSION__"
           releaseBody: "Automated release from GitHub Actions"
