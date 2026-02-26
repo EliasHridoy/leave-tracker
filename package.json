@@ -1,6 +1,7 @@
 {
   "name": "leave-tracker",
   "version": "0.1.0",
+  "packageManager": "yarn@4.6.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
