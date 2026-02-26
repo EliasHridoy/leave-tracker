@@ -350,6 +350,7 @@ fn delete_leave(id: i64, state: State<DbState>) -> Result<(), String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let db_path = app
                 .path()

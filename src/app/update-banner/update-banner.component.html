@@ -1,0 +1,29 @@
+@if (status.available && !dismissed) {
+  <div class="update-banner">
+    @if (!status.downloading) {
+      <div class="update-content">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L12 16M12 16L7 11M12 16L17 11" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 20H20" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round"/>
+        </svg>
+        <span>A new version ({{ status.version }}) is available.</span>
+        <button class="btn-update" (click)="downloadAndInstall()">
+          Update & Restart
+        </button>
+        <button class="btn-dismiss" (click)="dismiss()">&#x2715;</button>
+      </div>
+    } @else {
+      <div class="update-content">
+        <span>Downloading update... {{ status.progress }}%</span>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="status.progress"></div>
+        </div>
+      </div>
+    }
+    @if (status.error) {
+      <div class="update-error">Update failed: {{ status.error }}</div>
+    }
+  </div>
+}

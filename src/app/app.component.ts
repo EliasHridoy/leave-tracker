@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Employee } from './models/models';
 import { LeaveTrackerService } from './services/leave-tracker.service';
 import { EmployeeDetailComponent } from './employee-detail/employee-detail.component';
+import { UpdateBannerComponent } from './update-banner/update-banner.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule, EmployeeDetailComponent],
+  imports: [FormsModule, EmployeeDetailComponent, UpdateBannerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

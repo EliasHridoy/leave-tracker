@@ -13,7 +13,12 @@
       "Bash(nvm use 20)",
       "Bash(node --version)",
       "Bash(nvm ls)",
-      "Bash(nvm use 22)"
+      "Bash(nvm use 22)",
+      "Bash(yarn add @tauri-apps/plugin-updater)",
+      "Bash(unset LD_LIBRARY_PATH)",
+      "Bash(yarn tauri dev)",
+      "Bash(nvm current)",
+      "Bash(nvm install 20)"
     ]
   }
 }
