@@ -26,7 +26,9 @@ jobs:
           cache: yarn
 
       - name: enable corepack
-        run: corepack enable
+        run: |
+          corepack enable
+          corepack prepare yarn@4.6.0 --activate
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -43,7 +45,7 @@ jobs:
             patchelf
 
       - name: install frontend dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: build and release
         uses: tauri-apps/tauri-action@v0
