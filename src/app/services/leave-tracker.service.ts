@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
-import { Employee, LeaveRecord, EmployeeDetail } from '../models/models';
+import { Employee, LeaveRecord, EmployeeDetail, LeaveAllocations } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class LeaveTrackerService {
@@ -8,12 +8,16 @@ export class LeaveTrackerService {
     return invoke('get_employees');
   }
 
-  createEmployee(name: string): Promise<Employee> {
-    return invoke('create_employee', { name });
+  createEmployee(name: string, annual: number, sick: number, casual: number): Promise<Employee> {
+    return invoke('create_employee', { name, annual, sick, casual });
   }
 
-  updateEmployee(id: number, name: string): Promise<Employee> {
-    return invoke('update_employee', { id, name });
+  updateEmployee(id: number, name: string, annual: number, sick: number, casual: number): Promise<Employee> {
+    return invoke('update_employee', { id, name, annual, sick, casual });
+  }
+
+  getLeaveAllocations(id: number): Promise<LeaveAllocations> {
+    return invoke('get_leave_allocations', { id });
   }
 
   deleteEmployee(id: number): Promise<void> {

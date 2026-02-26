@@ -25,3 +25,9 @@ export interface EmployeeDetail {
   leave_records: LeaveRecord[];
   leave_summary: LeaveSummary[];
 }
+
+export interface LeaveAllocations {
+  annual: number;
+  sick: number;
+  casual: number;
+}

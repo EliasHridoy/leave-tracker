@@ -53,6 +53,30 @@
             </div>
           </div>
         }
+        <div class="summary-card card-total">
+          <div class="card-top">
+            <span class="card-type">Total Leave</span>
+            <span class="card-alloc">{{ totalSummary.allocated }} days allocated</span>
+          </div>
+          <div class="card-numbers">
+            <div class="card-used">
+              <span class="num">{{ totalSummary.used }}</span>
+              <span class="lbl">Used</span>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-remaining" [class.exceeded]="totalSummary.remaining < 0">
+              <span class="num">{{ totalSummary.remaining < 0 ? totalSummary.remaining * -1 : totalSummary.remaining }}</span>
+              <span class="lbl">{{ totalSummary.remaining < 0 ? 'Exceeded' : 'Remaining' }}</span>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="progressWidth(totalSummary.used, totalSummary.allocated)"
+              [class.over]="totalSummary.remaining < 0"
+            ></div>
+          </div>
+        </div>
       </div>
     </div>
 

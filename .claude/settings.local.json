@@ -3,7 +3,17 @@
     "allow": [
       "Bash(env)",
       "Bash(else)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(yarn --version)",
+      "Bash(yarn dev)",
+      "Bash(yarn install)",
+      "Bash(cargo check --manifest-path src-tauri/Cargo.toml)",
+      "Bash(yarn ng build)",
+      "Bash(source ~/.nvm/nvm.sh)",
+      "Bash(nvm use 20)",
+      "Bash(node --version)",
+      "Bash(nvm ls)",
+      "Bash(nvm use 22)"
     ]
   }
 }

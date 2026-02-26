@@ -52,6 +52,14 @@ fn init_db(conn: &Connection) -> SqlResult<()> {
             reason TEXT,
             created_at TEXT DEFAULT (datetime('now', 'localtime')),
             FOREIGN KEY (employee_id) REFERENCES employees(id)
+        );
+        CREATE TABLE IF NOT EXISTS leave_allocations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            employee_id INTEGER NOT NULL UNIQUE,
+            annual INTEGER NOT NULL DEFAULT 15,
+            sick INTEGER NOT NULL DEFAULT 10,
+            casual INTEGER NOT NULL DEFAULT 5,
+            FOREIGN KEY (employee_id) REFERENCES employees(id)
         );",
     )
 }
@@ -77,7 +85,13 @@ fn get_employees(state: State<DbState>) -> Result<Vec<Employee>, String> {
 }
 
 #[tauri::command]
-fn create_employee(name: String, state: State<DbState>) -> Result<Employee, String> {
+fn create_employee(
+    name: String,
+    annual: i64,
+    sick: i64,
+    casual: i64,
+    state: State<DbState>,
+) -> Result<Employee, String> {
     let conn = state.0.lock().map_err(|e| e.to_string())?;
     conn.execute(
         "INSERT INTO employees (name) VALUES (?1)",
@@ -85,6 +99,11 @@ fn create_employee(name: String, state: State<DbState>) -> Result<Employee, Stri
     )
     .map_err(|e| e.to_string())?;
     let id = conn.last_insert_rowid();
+    conn.execute(
+        "INSERT INTO leave_allocations (employee_id, annual, sick, casual) VALUES (?1, ?2, ?3, ?4)",
+        params![id, annual, sick, casual],
+    )
+    .map_err(|e| e.to_string())?;
     conn.query_row(
         "SELECT id, name, created_at FROM employees WHERE id = ?1",
         params![id],
@@ -100,11 +119,24 @@ fn create_employee(name: String, state: State<DbState>) -> Result<Employee, Stri
 }
 
 #[tauri::command]
-fn update_employee(id: i64, name: String, state: State<DbState>) -> Result<Employee, String> {
+fn update_employee(
+    id: i64,
+    name: String,
+    annual: i64,
+    sick: i64,
+    casual: i64,
+    state: State<DbState>,
+) -> Result<Employee, String> {
     let conn = state.0.lock().map_err(|e| e.to_string())?;
     conn.execute(
         "UPDATE employees SET name = ?1 WHERE id = ?2",
         params![name.trim(), id],
+    )
+    .map_err(|e| e.to_string())?;
+    conn.execute(
+        "INSERT INTO leave_allocations (employee_id, annual, sick, casual) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT(employee_id) DO UPDATE SET annual = ?2, sick = ?3, casual = ?4",
+        params![id, annual, sick, casual],
     )
     .map_err(|e| e.to_string())?;
     conn.query_row(
@@ -115,6 +147,30 @@ fn update_employee(id: i64, name: String, state: State<DbState>) -> Result<Emplo
                 id: row.get(0)?,
                 name: row.get(1)?,
                 created_at: row.get(2)?,
+            })
+        },
+    )
+    .map_err(|e| e.to_string())
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LeaveAllocations {
+    pub annual: i64,
+    pub sick: i64,
+    pub casual: i64,
+}
+
+#[tauri::command]
+fn get_leave_allocations(id: i64, state: State<DbState>) -> Result<LeaveAllocations, String> {
+    let conn = state.0.lock().map_err(|e| e.to_string())?;
+    conn.query_row(
+        "SELECT annual, sick, casual FROM leave_allocations WHERE employee_id = ?1",
+        params![id],
+        |row| {
+            Ok(LeaveAllocations {
+                annual: row.get(0)?,
+                sick: row.get(1)?,
+                casual: row.get(2)?,
             })
         },
     )
@@ -126,6 +182,11 @@ fn delete_employee(id: i64, state: State<DbState>) -> Result<(), String> {
     let conn = state.0.lock().map_err(|e| e.to_string())?;
     conn.execute(
         "DELETE FROM leave_records WHERE employee_id = ?1",
+        params![id],
+    )
+    .map_err(|e| e.to_string())?;
+    conn.execute(
+        "DELETE FROM leave_allocations WHERE employee_id = ?1",
         params![id],
     )
     .map_err(|e| e.to_string())?;
@@ -176,7 +237,16 @@ fn get_employee_detail(
         .collect::<SqlResult<Vec<_>>>()
         .map_err(|e| e.to_string())?;
 
-    let allocations = [("annual", 15i64), ("sick", 10i64), ("casual", 5i64)];
+    // Read allocations from DB, fallback to defaults if not found
+    let (alloc_annual, alloc_sick, alloc_casual) = conn
+        .query_row(
+            "SELECT annual, sick, casual FROM leave_allocations WHERE employee_id = ?1",
+            params![id],
+            |row| Ok((row.get::<_, i64>(0)?, row.get::<_, i64>(1)?, row.get::<_, i64>(2)?)),
+        )
+        .unwrap_or((15, 10, 5));
+
+    let allocations = [("annual", alloc_annual), ("sick", alloc_sick), ("casual", alloc_casual)];
     let year_str = year.to_string();
     let mut leave_summary = Vec::new();
     for (leave_type, allocated) in &allocations {
@@ -299,6 +369,7 @@ pub fn run() {
             create_employee,
             update_employee,
             delete_employee,
+            get_leave_allocations,
             get_employee_detail,
             add_leave,
             update_leave,

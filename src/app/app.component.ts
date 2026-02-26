@@ -18,6 +18,9 @@ export class AppComponent implements OnInit {
   showModal = false;
   editingEmployee: Employee | null = null;
   employeeName = '';
+  annualLeave = 15;
+  sickLeave = 10;
+  casualLeave = 5;
 
   constructor(private service: LeaveTrackerService) {}
 
@@ -43,13 +46,25 @@ export class AppComponent implements OnInit {
   openAddModal() {
     this.editingEmployee = null;
     this.employeeName = '';
+    this.annualLeave = 15;
+    this.sickLeave = 10;
+    this.casualLeave = 5;
     this.showModal = true;
   }
 
-  openEditModal(employee: Employee, event: Event) {
+  async openEditModal(employee: Employee, event: Event) {
     event.stopPropagation();
     this.editingEmployee = employee;
     this.employeeName = employee.name;
+    this.annualLeave = 15;
+    this.sickLeave = 10;
+    this.casualLeave = 5;
+    try {
+      const alloc = await this.service.getLeaveAllocations(employee.id);
+      this.annualLeave = alloc.annual;
+      this.sickLeave = alloc.sick;
+      this.casualLeave = alloc.casual;
+    } catch {}
     this.showModal = true;
   }
 
@@ -61,9 +76,9 @@ export class AppComponent implements OnInit {
     if (!this.employeeName.trim()) return;
     try {
       if (this.editingEmployee) {
-        await this.service.updateEmployee(this.editingEmployee.id, this.employeeName);
+        await this.service.updateEmployee(this.editingEmployee.id, this.employeeName, this.annualLeave, this.sickLeave, this.casualLeave);
       } else {
-        const emp = await this.service.createEmployee(this.employeeName);
+        const emp = await this.service.createEmployee(this.employeeName, this.annualLeave, this.sickLeave, this.casualLeave);
         this.selectedEmployee = emp;
       }
       this.showModal = false;

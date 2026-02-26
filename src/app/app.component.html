@@ -90,6 +90,41 @@
           placeholder="e.g. John Smith"
           (keyup.enter)="saveEmployee()"
         />
+        <div class="leave-alloc-section">
+          <div class="leave-alloc-label">Leave Allocation (days per year)</div>
+          <div class="leave-alloc-row">
+            <div class="leave-alloc-field">
+              <label for="annual-leave">Annual</label>
+              <input
+                id="annual-leave"
+                type="number"
+                [(ngModel)]="annualLeave"
+                name="annualLeave"
+                min="0"
+              />
+            </div>
+            <div class="leave-alloc-field">
+              <label for="sick-leave">Sick</label>
+              <input
+                id="sick-leave"
+                type="number"
+                [(ngModel)]="sickLeave"
+                name="sickLeave"
+                min="0"
+              />
+            </div>
+            <div class="leave-alloc-field">
+              <label for="casual-leave">Casual</label>
+              <input
+                id="casual-leave"
+                type="number"
+                [(ngModel)]="casualLeave"
+                name="casualLeave"
+                min="0"
+              />
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn-secondary" type="button" (click)="closeModal()">Cancel</button>

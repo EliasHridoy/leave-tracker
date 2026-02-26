@@ -116,7 +116,7 @@
 /* Summary Cards */
 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
 
@@ -131,6 +131,9 @@
 .card-annual { border-color: #e0e7ff; }
 .card-sick { border-color: #fef3c7; }
 .card-casual { border-color: #d1fae5; }
+.card-total { border-color: #e2e8f0; background: #f8fafc; }
+.card-total .card-type { color: #1e293b; }
+.card-total .progress-fill { background: #64748b; }
 
 .card-top {
   display: flex;

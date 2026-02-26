@@ -115,6 +115,14 @@ export class EmployeeDetailComponent implements OnChanges {
     return name.charAt(0).toUpperCase();
   }
 
+  get totalSummary() {
+    if (!this.detail) return { allocated: 0, used: 0, remaining: 0 };
+    const s = this.detail.leave_summary;
+    const allocated = s.reduce((sum, x) => sum + x.allocated, 0);
+    const used = s.reduce((sum, x) => sum + x.used, 0);
+    return { allocated, used, remaining: allocated - used };
+  }
+
   progressWidth(used: number, allocated: number): number {
     if (allocated <= 0) return 0;
     return Math.min((used / allocated) * 100, 100);
