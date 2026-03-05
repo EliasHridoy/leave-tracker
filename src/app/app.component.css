@@ -194,7 +194,8 @@
 /* Main Content */
 .content {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
+  min-height: 0;
   background: #f8fafc;
 }
 
